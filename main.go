@@ -54,12 +54,8 @@ func FetchSingleUser(c *gin.Context) {
 		return
 	}
 	pinger.OnRecv = func(pkt *ping.Packet) {
-		fmt.Printf("来自 %s 的回复: 字节=%d icmp_seq=%d 时间=%v ttl=%v\n",
-			pkt.IPAddr, pkt.Nbytes, pkt.Seq, pkt.Rtt, pkt.Ttl)
 	}
 	pinger.OnDuplicateRecv = func(pkt *ping.Packet) {
-		fmt.Printf("来自 %s 的回复: 字节=%d icmp_seq=%d 时间=%v ttl=%v\n",
-			pkt.IPAddr, pkt.Nbytes, pkt.Seq, pkt.Rtt, pkt.Ttl)
 	}
 	pinger.OnFinish = func(stats *ping.Statistics) {
 	}

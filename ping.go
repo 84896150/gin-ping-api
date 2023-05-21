@@ -52,18 +52,19 @@ type Transaction struct {
 	//Category string `json:"category"`
 	//Lng      string `json:"lng"`
 	//Lat      string `json:"lat"`
-	IP    string `json:"ip"`
-	Stats string `json:"stats"`
+	IP     string `json:"ip"`
+	Status string `json:"status"`
+	Bucket string `json:"bucket"`
 	//Public   string `json:"public"`
 	//Mac      string `json:"mac"`
 	//Room     string `json:"room"`
 	//Lasttime string `json:"lasttime"`
 	//Days     string `json:"days"`
-	T string `json:"t"`
+	T string `json:"time"`
 }
 
 //多线程
-func IPpingStart(line string, req chan []string, status chan int, key string, t string) {
+func IPpingStart(line string, req chan []string, status chan int, key string, bucket string) {
 	ping, err := Run(line, 8, Data)
 	if err != nil {
 		fmt.Println(err)
@@ -81,7 +82,7 @@ func IPpingStart(line string, req chan []string, status chan int, key string, t 
 		fmt.Println(line + " " + respones + key)
 	}
 	<-status
-	req <- []string{line, respones, key, t}
+	req <- []string{line, respones, key, bucket, time.Now().Format("2006-01-02 15:04:05")} //取当前时间戳
 }
 
 func main() {
@@ -156,7 +157,7 @@ func FetchSingleUser(c *gin.Context) {
 	fmt.Println("正确的IP资源总数....", LinsNum)
 	for _, i := range transactions {
 		status <- 1
-		go IPpingStart(i.IP, req, status, i.Key, i.T)
+		go IPpingStart(i.IP, req, status, i.Key, i.Bucket)
 	}
 
 	strings_req := []string{"ip", "status"} //输出表头
@@ -177,7 +178,7 @@ func FetchSingleUser(c *gin.Context) {
 			Pingerr++
 		}
 		fd.Write(buf)
-		slice = append(slice, Transaction{strings_req[2], strings_req[0], strings_req[1], strings_req[3]})
+		slice = append(slice, Transaction{strings_req[2], strings_req[0], strings_req[1], strings_req[3], strings_req[4]})
 	}
 	fd.Close()
 
